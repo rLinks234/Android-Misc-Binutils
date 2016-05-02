@@ -1,0 +1,20 @@
+#!/bin/sh
+
+HERE=`dirname $0`
+
+which ndk-build &> /dev/null
+
+NDK_NOT_IN_PATH=`echo $?`
+
+if [ "$NDK_NOT_IN_PATH" != "0" ]; then
+	echo 'warning: NDK does not appear to be in PATH'
+fi
+
+if [ "$OSTYPE"=="linux*" ]; then
+
+	CPU_CORES=`ls /sys/bus/cpu/devices | grep -e "cpu*" -c`
+	CPU_CORES=-j$CPU_CORES
+
+fi
+
+$CRYSTAX_HOME/ndk-build $CPU_CORES NDK_PROJECT_PATH=$HERE/src APP_BUILD_SCRIPT=$HERE/src/Android.mk NDK_APPLICATION_MK=$HERE/src/Application.mk NDK_LIBS_OUT=$HERE/bin NDK_OUT=$HERE/obj $@
