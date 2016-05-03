@@ -28,7 +28,7 @@ else
     BOOST_ROOT :=$(NDK_ROOT)/sources/boost/1.59.0
 endif
 
-APP_CPPFLAGS +=-D_LIBCPP_HAS_C11_FEATURES
+APP_CPPFLAGS +=-D_LIBCPP_HAS_C11_FEATURES -Wno-format-security
 
 APP_CPPFLAGS +=-I$(BOOST_ROOT)/include \
 -I$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/../include)

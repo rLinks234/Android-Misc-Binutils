@@ -7,11 +7,13 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wformat"
 
-#define VERSION_STR "1.00"
+#define VERSION_STR "1.01"
 #define MINIMUM_FONT_SIZE 4
 #define DPI_DEFAULT 320
 #define MIN_DPI 60
-#define PIXEL_PADDING 4
+
+// TODO - allow for user to change this
+#define DEFAULT_PIXEL_PADDING 8
 
 static const vector<uint16_t> bmp_sizes = { 
 	64, 96, 128, 192, 224, 256, 384, 512, 768, 1024, 1536, 2048, 3072, 4096 
@@ -496,15 +498,15 @@ int32_t BmfWriterTask::run() {
 
 	FT_Glyph glyph;
 
-	uint32_t currentX_px = PIXEL_PADDING - 1;
-	uint32_t currentY_px = PIXEL_PADDING - 1;
+	uint32_t currentX_px = DEFAULT_PIXEL_PADDING - 1;
+	uint32_t currentY_px = DEFAULT_PIXEL_PADDING - 1;
 
 	// calcuate needed bitmap size
 
 	FT_Size_Metrics szMetrics = ftFace->size->metrics;
 
-	const int32_t max_font_width = ( szMetrics.max_advance / 64 ) + PIXEL_PADDING;
-	const int32_t max_font_height = ( (szMetrics.ascender - szMetrics.descender) / 64 ) + PIXEL_PADDING;
+	const int32_t max_font_width = ( szMetrics.max_advance / 64 ) + DEFAULT_PIXEL_PADDING;
+	const int32_t max_font_height = ( (szMetrics.ascender - szMetrics.descender) / 64 ) + DEFAULT_PIXEL_PADDING;
 
 	uint16_t dimension = 0;
 
@@ -563,7 +565,7 @@ int32_t BmfWriterTask::run() {
 
 	if (instance->packBitmaps()) {
 
-		const uint16_t t_newHeight = currentY_px + max_font_height + PIXEL_PADDING;
+		const uint16_t t_newHeight = currentY_px + max_font_height + DEFAULT_PIXEL_PADDING;
 
 		if (verbose()) {
 			print_verboseln("packing bitmap as requested. height %u ---> %u\n", bitmap_height, t_newHeight);
@@ -607,11 +609,11 @@ void BmfWriterTask::renderToBitmap(uint16_t pGlyph, uint32_t pGlyphIndex, uint32
 	uint32_t cursorX = pCursorX;
 	uint32_t cursorY = pCursorY;
 
-	if ( ( pCursorX + X_advance + PIXEL_PADDING ) > bitmap_width ) {
+	if ( ( pCursorX + X_advance + DEFAULT_PIXEL_PADDING ) > bitmap_width ) {
 
 		// need to shift down a line
-		cursorX = PIXEL_PADDING - 1;
-		cursorY += Y_advance + PIXEL_PADDING;
+		cursorX = DEFAULT_PIXEL_PADDING - 1;
+		cursorY += Y_advance + DEFAULT_PIXEL_PADDING;
 
 		pCursorY = cursorY;
 
@@ -622,8 +624,8 @@ void BmfWriterTask::renderToBitmap(uint16_t pGlyph, uint32_t pGlyphIndex, uint32
 
 	// The first glyph will actually be written near the end of the bitmap vector
 	// For instance, a (w,h) = (512,512) (size = 262,144) shall have its first glyph written starting at index:
-	// index = 262144 - (PIXEL_PADDING - 1) * w + (PIXEL_PADDING - 1) 
-	// for PIXEL_PADDING = 4, index = 260611
+	// index = 262144 - (DEFAULT_PIXEL_PADDING - 1) * w + (DEFAULT_PIXEL_PADDING - 1) 
+	// for DEFAULT_PIXEL_PADDING = 4, index = 260611
 
 	for (uint32_t srcX = 0, dstX = cursorX; srcX < bmpWidth; srcX++, dstX++) {
 
@@ -643,7 +645,7 @@ void BmfWriterTask::renderToBitmap(uint16_t pGlyph, uint32_t pGlyphIndex, uint32
 	currentGlyphEntry.mTRx = cursorX + X_advance;
 	currentGlyphEntry.mTRy = cursorY;
 
-	pCursorX = cursorX + X_advance + PIXEL_PADDING;
+	pCursorX = cursorX + X_advance + DEFAULT_PIXEL_PADDING;
 
 }
 

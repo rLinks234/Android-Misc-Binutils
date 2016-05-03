@@ -219,7 +219,7 @@ void BmfStub::writeBitmapToFile(const string& pOutput) {
 						"provided argument proceeding a flag argument\n" 	\
 						"will be interpreted as the input argument\n\n"
 
-static void process_g(const string& pInputFile, const string& pOutputFile) {
+static void process_g(const string& pInputFile, const string& pOutputFile, bool pShowGlyphBoundaries) {
 
 	boost::shared_ptr<BmfStub> inputBmf = BmfStub::readBmf(pInputFile);
 
@@ -228,7 +228,11 @@ static void process_g(const string& pInputFile, const string& pOutputFile) {
 	}
 
 	inputBmf->printBmfData();
-	inputBmf->editFringePixels();
+
+	if (pShowGlyphBoundaries) {
+		inputBmf->editFringePixels();
+	}
+
 	inputBmf->writeBitmapToFile(pOutputFile);
 
 }
@@ -294,7 +298,7 @@ static int32_t dispatch(po::options_description& usage, po::variables_map& args)
 			outputFile = "out.bmp";
 		}
 
-		process_g(inputFile, outputFile);
+		process_g(inputFile, outputFile, args["show-bounds"].as<bool>());
 
 	} else if (header) {
 		process_f(inputFile);
@@ -308,9 +312,10 @@ int main(int argc, char** argv) {
 
 	po::options_description general("General Options");
 	general.add_options()
-		("verbose,v", boost::program_options::bool_switch()->default_value(false), "print extra info")
-		("generate,g", boost::program_options::bool_switch()->default_value(false), "generate bitmap from input .bmf file")
-		("header,f", boost::program_options::bool_switch()->default_value(false), "read .bmf header and exit")
+		("verbose,v", boost::program_options::bool_switch()->default_value(false), "Print extra info")
+		("generate,g", boost::program_options::bool_switch()->default_value(false), "Generate bitmap from input .bmf file")
+		("header,f", boost::program_options::bool_switch()->default_value(false), "Read .bmf header and exit")
+		("show-bounds,s", boost::program_options::bool_switch()->default_value(false), "Show glyph boundaries (valid with -g)")
 		("output,o", po::value<string>(), "output file")
 		("input,i", po::value<string>()->required(), "input file (Required)")
 	;
