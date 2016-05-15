@@ -41,3 +41,25 @@ struct FontCacheHeader {
 #define FONTCACHEFILE_MAGIC 0x6366610A
 #define FONTCACHEFILE_MAJOR_VERSION 0x10
 #define FONTCACHEFILE_MINOR_VERSION 0x03
+
+/**
+ *
+ * Using `djb2` (Dan Bernstein) 
+ * algorithm 
+ *
+ * @param  pString [description]
+ *
+ * @return         [description]
+ */
+static uint32_t hash_name(std::string& pString) {
+
+	uint32_t hash = 5381;
+	int32_t c;
+
+	for (char& c : pString) {
+		hash = ((hash << 5) + hash) + static_cast<int32_t>(c); // hash * 33 + c
+	}
+
+	return hash;
+
+}

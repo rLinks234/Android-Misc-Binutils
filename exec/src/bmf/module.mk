@@ -20,6 +20,16 @@ include $(EXEC_MK)
 
 include $(CLEAR_VARS)
 
+LOCAL_MODULE :=bmfhash
+
+LOCAL_STATIC_LIBRARIES :=ft2-prebuilt boost_program_options_static
+
+LOCAL_SRC_FILES :=bmf/bmfhash.cpp
+
+include $(EXEC_MK)
+
+include $(CLEAR_VARS)
+
 LOCAL_MODULE :=bmfpack
 
 LOCAL_STATIC_LIBRARIES :=ft2-prebuilt boost_program_options_static

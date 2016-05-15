@@ -54,19 +54,6 @@ static int32_t try_get_dpi() {
 
 }
 
-static uint32_t hash_name(string& pString) {
-
-	uint32_t hash = 5381;
-	int32_t c;
-
-	for (char& c : pString) {
-		hash = ((hash << 5) + hash) + static_cast<int32_t>(c); // hash * 33 + c
-	}
-
-	return hash;
-
-}
-
 static bool is_digit(char pCharacter) {
 	return (pCharacter >= '0') && (pCharacter <= '9');
 }
@@ -96,7 +83,7 @@ static void repl_out_if_needed(string& pInputFile, string& pOutputFile) {
 static bool is_ttf(string const & pValue) {
 
 	if (ttf_extension.size() > pValue.size()) {
-    	return false;	
+    	return false;
     }
 
 	return std::equal(ttf_extension.rbegin(), ttf_extension.rend(), pValue.rbegin());
@@ -261,7 +248,7 @@ void BmfWriter::addJob(const string& pInput, const string& pOutput) {
 
 	FT_Face thzFace;
 
-	FT_New_Face( ftLibrary, pInput.c_str(), 0, &thzFace );
+	FT_New_Face(ftLibrary, pInput.c_str(), 0, &thzFace);
 
 	jobs.push_back(
 		BmfWriterTask(thzFace, boost::shared_ptr<const BmfWriter>(this), pInput, pOutput)
@@ -421,12 +408,18 @@ void BmfWriterTask::writeToFile() {
 
 	FontCacheHeader header;
 
-	string family_name( ftFace->family_name );
+	string family_name(ftFace->family_name);
+	string hash_string(family_name);
+
+	// Per FreeType API, this can be null
+	if (ftFace->style_name != nullptr) {
+		hash_string.append(ftFace->style_name);
+	}
 
 	header.magic = FONTCACHEFILE_MAGIC;
 	header.mMajorVersion = FONTCACHEFILE_MAJOR_VERSION;
 	header.mMinorVersion = FONTCACHEFILE_MINOR_VERSION;
-	header.mID = hash_name(family_name);
+	header.mID = hash_name(hash_string);
 	header.mFlags = 0; // TODO
 
 	header.mNumberOfGlyphs = static_cast<uint16_t>(glyphs.size());
@@ -541,7 +534,7 @@ int32_t BmfWriterTask::run() {
 	bitmap_height = dimension;
 	bitmap_width = dimension;
 
-	const uint32_t px = dimension * dimension;
+	const size_t px = dimension * dimension;
 	bitmap = vector<uint8_t>(px);
 
 	bzero(bitmap.data(), px);
@@ -550,7 +543,7 @@ int32_t BmfWriterTask::run() {
 		print_verboseln("\tbeginning bitmap render [%s]", inputFile.c_str());
 	}
 
-	for ( uint32_t n = 0; n < text_length; n++ ) {
+	for ( size_t n = 0; n < text_length; n++ ) {
 
 		const char c = ASCII_LIST[n];
 
@@ -761,7 +754,7 @@ static boost::shared_ptr<BmfWriter> create_instance(po::variables_map& pArgs) {
 
 	} else if ( in_len < out_len ) {
 
-		print_warnln("warning: ignoring last %zu output files specified (user provided too many)", outputFiles.size() - inputFiles.size() );
+		print_warnln("warning: ignoring last %zu output files specified (user provided too many)", outputFiles.size() - inputFiles.size());
 	
 		const uint32_t count = inputFiles.size();
 
@@ -872,7 +865,7 @@ int32_t main(int32_t argc, char* argv[]) {
 
 	} catch (...) {
 
-		print_errorln("\nCaught unknown exception...");
+		print_errorln("\nCaught unknown exception");
 		return 4;
 
 	}
