@@ -1,5 +1,4 @@
-#APP_ABI :=armeabi-v7a x86 x86_64 arm64-v8a
-APP_ABI :=armeabi-v7a
+APP_ABI :=armeabi-v7a x86 x86_64 arm64-v8a
 NDK_TOOLCHAIN_VERSION :=clang
 APP_PLATFORM :=android-14
 APP_OPTIM :=release
@@ -8,8 +7,9 @@ APP_STL :=c++_static
 
 PIE_FLAGS :=-fPIE -Wl,-pie
 
-AJDT_MK_DIR :=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/../mk)
-AJDT_LIB_DIR :=$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/../../lib)
+AJDT_MK_DIR :=$(abspath $(NDK_PROJECT_PATH)/../mk)
+AJDT_LIB_DIR :=$(abspath $(NDK_PROJECT_PATH)/../../lib)
+AJDT_INC_DIR :=$(abspath $(NDK_PROJECT_PATH)/../include)
 
 EXEC_MK :=$(AJDT_MK_DIR)/build_execs.mk
 
@@ -31,7 +31,7 @@ endif
 APP_CPPFLAGS +=-D_LIBCPP_HAS_C11_FEATURES -Wno-format-security
 
 APP_CPPFLAGS +=-I$(BOOST_ROOT)/include \
--I$(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/../include)
+	-I$(AJDT_INC_DIR)
 
 # ----------------
 # Functions
