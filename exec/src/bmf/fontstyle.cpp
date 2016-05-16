@@ -14,7 +14,8 @@ using namespace std;
 enum FontStyle {
 	kRegular,
 	kItalic,
-	kBold
+	kBold,
+	kBoldItalic
 };
 
 static FontStyle getFontStyleFromFlag(FT_Long pFlags) {
@@ -22,10 +23,12 @@ static FontStyle getFontStyleFromFlag(FT_Long pFlags) {
 	bool isItalic = pFlags & FT_STYLE_FLAG_ITALIC;
 	bool isBold = pFlags & FT_STYLE_FLAG_BOLD;
 
-	if (isItalic) {
+	if (isItalic && !isBold) {
 		return kItalic;
-	} else if (isBold) {
+	} else if (isBold && !isItalic) {
 		return kBold;
+	} else if (isBold && isItalic) {
+		return kBoldItalic;
 	} else {
 		return kRegular;
 	}
@@ -81,6 +84,13 @@ static int32_t run(std::string& pFileLocation, bool pHumanReadable) {
 
 			}
 
+			case kBoldItalic: {
+
+				printf("BoldItalic\n");
+				break;
+
+			}
+
 		}
 
 	} else {
@@ -108,6 +118,13 @@ static int32_t run(std::string& pFileLocation, bool pHumanReadable) {
 
 			}
 
+			case kBoldItalic: {
+
+				printf("%d\n", BMF_BOLDITALIC);
+				break;
+
+			}
+
 		}
 
 	}
@@ -118,7 +135,7 @@ static int32_t run(std::string& pFileLocation, bool pHumanReadable) {
 
 ////////////////////////////////
 
-#define EXTRA_ARGS "Output possiblities:\n\nRegular [0]\nItalic [1]\nBold [2]\n"
+#define EXTRA_ARGS "Output possiblities:\n\nRegular [0]\nItalic [1]\nBold [2]\nBoldItalic [3]\n"
 
 int32_t main(int32_t argc, char* argv[]) {
 

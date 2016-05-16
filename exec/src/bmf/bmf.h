@@ -45,6 +45,7 @@ struct FontCacheHeader {
 #define BMF_REGULAR 0
 #define BMF_ITALIC 1
 #define BMF_BOLD 2
+#define BMF_BOLDITALIC 3
 
 /**
  *

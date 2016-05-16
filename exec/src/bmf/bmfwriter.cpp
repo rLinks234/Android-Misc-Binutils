@@ -176,6 +176,7 @@ class BmfWriterTask {
 	 * 0 for Regular
 	 * 1 for Italic
 	 * 2 for Bold
+	 * 3 for BoldItalic
 	 * 
 	 */
 	int8_t style_code;
@@ -504,10 +505,12 @@ int32_t BmfWriterTask::run() {
 	bool isItalic = pFlags & FT_STYLE_FLAG_ITALIC;
 	bool isBold = pFlags & FT_STYLE_FLAG_BOLD;
 	
-	if (isItalic) {
+	if (isItalic && !isBold) {
 		style_code = BMF_ITALIC;
-	} else if (isBold) {
+	} else if (isBold && !isItalic) {
 		style_code = BMF_BOLD;
+	} else if (isItalic && isBold){
+		style_code = BMF_BOLDITALIC;
 	} else {
 		style_code = BMF_REGULAR;
 	}
