@@ -171,6 +171,15 @@ class BmfWriterTask {
 	string inputFile;
 	string outputFile;
 
+	/**
+	 * 
+	 * 0 for Regular
+	 * 1 for Italic
+	 * 2 for Bold
+	 * 
+	 */
+	int8_t style_code;
+
 	vector<GlyphEntry> glyphs;
 	vector<uint8_t> bitmap;
 
@@ -194,7 +203,7 @@ public:
 		FT_Face pFace, boost::shared_ptr<const BmfWriter> pInstance, const string& pInputFile, const string& pOutputFile
 	)
 		: ftFace(pFace), instance(pInstance), inputFile(pInputFile), outputFile(pOutputFile), 
-		bitmap_width(0), bitmap_height(0) {
+		style_code(0), bitmap_width(0), bitmap_height(0) {
 
 			if (!is_ttf(pInputFile)) {
 				print_warnln("Warning: input file `%s` is an unknown font file", pInputFile.c_str());
@@ -420,7 +429,7 @@ void BmfWriterTask::writeToFile() {
 	header.mMajorVersion = FONTCACHEFILE_MAJOR_VERSION;
 	header.mMinorVersion = FONTCACHEFILE_MINOR_VERSION;
 	header.mID = hash_name(hash_string);
-	header.mFlags = 0; // TODO
+	header.mFlags = style_code; // TODO
 
 	header.mNumberOfGlyphs = static_cast<uint16_t>(glyphs.size());
 	header.mBitmapWidth = static_cast<uint16_t>(bitmap_width);
@@ -485,6 +494,22 @@ int32_t BmfWriterTask::run() {
 		print_errorln("FT_New_Face() returned %d", error);
 		return 1;
 
+	}
+
+	////////////////////////////////
+	/// Set flags
+	
+	FT_Long pFlags = ftFace->style_flags;
+
+	bool isItalic = pFlags & FT_STYLE_FLAG_ITALIC;
+	bool isBold = pFlags & FT_STYLE_FLAG_BOLD;
+	
+	if (isItalic) {
+		style_code = BMF_ITALIC;
+	} else if (isBold) {
+		style_code = BMF_BOLD;
+	} else {
+		style_code = BMF_REGULAR;
 	}
 
 	error = FT_Set_Char_Size( ftFace, 0, instance->getFontSize() * 64, instance->getDpi(), instance->getDpi() );

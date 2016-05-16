@@ -42,6 +42,10 @@ struct FontCacheHeader {
 #define FONTCACHEFILE_MAJOR_VERSION 0x10
 #define FONTCACHEFILE_MINOR_VERSION 0x03
 
+#define BMF_REGULAR 0
+#define BMF_ITALIC 1
+#define BMF_BOLD 2
+
 /**
  *
  * Using `djb2` (Dan Bernstein) 

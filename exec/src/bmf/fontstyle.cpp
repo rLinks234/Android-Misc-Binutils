@@ -11,7 +11,28 @@
 
 using namespace std;
 
-static int32_t run(std::string& pFileLocation, bool pOnlyStringName) {
+enum FontStyle {
+	kRegular,
+	kItalic,
+	kBold
+};
+
+static FontStyle getFontStyleFromFlag(FT_Long pFlags) {
+
+	bool isItalic = pFlags & FT_STYLE_FLAG_ITALIC;
+	bool isBold = pFlags & FT_STYLE_FLAG_BOLD;
+
+	if (isItalic) {
+		return kItalic;
+	} else if (isBold) {
+		return kBold;
+	} else {
+		return kRegular;
+	}
+
+}
+
+static int32_t run(std::string& pFileLocation, bool pHumanReadable) {
 
 	FT_Library ftLib;
 	FT_Error error = FT_Init_FreeType(&ftLib);
@@ -33,43 +54,78 @@ static int32_t run(std::string& pFileLocation, bool pOnlyStringName) {
 
 	}
 
-	if (pOnlyStringName) {
+	FontStyle style = getFontStyleFromFlag(ftFace->style_flags);
 
-		printf("%s\n", ftFace->family_name);
+	if (pHumanReadable) {
 
-		if (ftFace->style_name != nullptr) {
-			printf("%s\n", ftFace->style_name);
+		switch(style) {
+			
+			case kRegular: {
+			
+				printf("Regular\n");
+				break;
+
+			}
+
+			case kItalic: {
+
+				printf("Italic\n");
+				break;
+
+			}
+
+			case kBold: {
+
+				printf("Bold\n");
+				break;
+
+			}
+
 		}
-
-		return 0;
 
 	} else {
 
-		string family_string(ftFace->family_name);
+		switch(style) {
 
-		// Per FreeType API, this can be null
-		if (ftFace->style_name != nullptr) {
-			family_string.append(ftFace->style_name);
+			case kRegular: {
+			
+				printf("%d\n", BMF_REGULAR);
+				break;
+
+			}
+
+			case kItalic: {
+
+				printf("%d\n", BMF_ITALIC);
+				break;
+
+			}
+
+			case kBold: {
+
+				printf("%d\n", BMF_BOLD);
+				break;
+
+			}
+
 		}
 
-		uint32_t id = hash_name(family_string);
-
-		printf("%u\n", id);
-
-		return 0;
-
 	}
+
+	return 0;
 
 }
 
 ////////////////////////////////
+
+#define EXTRA_ARGS "Output possiblities:\n\nRegular [0]\nItalic [1]\nBold [2]\n"
 
 int32_t main(int32_t argc, char* argv[]) {
 
 	po::options_description general("General Options");
 	general.add_options()
 		("input,i", po::value<string>()->required(), "specify input file (Required)")
-		("only-name,n", po::bool_switch()->default_value(false), "Only print font name")
+		("readable,x", po::bool_switch()->default_value(false), "Print as human readable")
 	;
 
 	try {
@@ -86,7 +142,7 @@ int32_t main(int32_t argc, char* argv[]) {
 
 		if (hasHelpOptions(help_vm)) {
 
-			printUsage(general, "");
+			printUsage(general, EXTRA_ARGS);
 			return 0;
 
 		} else if (hasVersion(help_vm)) {
@@ -112,7 +168,7 @@ int32_t main(int32_t argc, char* argv[]) {
 		notify(vm);
 
 		string f = vm["input"].as<string>();
-		bool sp = vm["only-name"].as<bool>();
+		bool sp = vm["readable"].as<bool>();
 
 		int32_t retCode = run(f, sp);
 
@@ -121,7 +177,7 @@ int32_t main(int32_t argc, char* argv[]) {
 	} catch (po::error& perr) {
 
 		print_errorln("\nError: %s", perr.what());
-		printUsage(general, "");
+		printUsage(general, EXTRA_ARGS);
 
 		return 1;
 

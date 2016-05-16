@@ -37,3 +37,13 @@ LOCAL_STATIC_LIBRARIES :=ft2-prebuilt boost_program_options_static
 LOCAL_SRC_FILES :=bmf/bmfpack.cpp
 
 include $(EXEC_MK)
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE :=fontstyle
+
+LOCAL_STATIC_LIBRARIES :=ft2-prebuilt boost_program_options_static
+
+LOCAL_SRC_FILES :=bmf/fontstyle.cpp
+
+include $(EXEC_MK)
