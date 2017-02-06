@@ -1,6 +1,6 @@
 This folder contains various executables that create or analyze bmf files.
 
-bmf stands for *B*it*m*ap *F*ont.
+bmf stands for **B**it**M**ap **F**ont.
 
 It's simply some file format I've used while creating text rendering demos for OpenGL. It depends on FreeType2 for font rasterization.
 
